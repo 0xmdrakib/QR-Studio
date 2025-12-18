@@ -1,0 +1,32 @@
+{
+  "accountAssociation": {
+    "header": "REPLACE_ME",
+    "payload": "REPLACE_ME",
+    "signature": "REPLACE_ME"
+  },
+  "miniapp": {
+    "version": "1",
+    "name": "QR Studio",
+    "homeUrl": "https://your-app-url.com",
+    "iconUrl": "https://your-app-url.com/icon.png",
+    "splashImageUrl": "https://your-app-url.com/splash.png",
+    "splashBackgroundColor": "#f7f7fb",
+    "subtitle": "Any content \u2192 QR",
+    "description": "Turn any text or link into a clean QR code.",
+    "primaryCategory": "utility",
+    "tags": [
+      "utility",
+      "qr",
+      "wallet"
+    ],
+    "heroImageUrl": "https://your-app-url.com/hero.png",
+    "screenshotUrls": [
+      "https://your-app-url.com/hero.png"
+    ],
+    "tagline": "Anything to QR.",
+    "ogTitle": "QR Studio",
+    "ogDescription": "Turn any text or link into a clean QR code.",
+    "ogImageUrl": "https://your-app-url.com/hero.png",
+    "noindex": true
+  }
+}

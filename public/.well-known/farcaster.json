@@ -10,7 +10,7 @@
     "homeUrl": "https://your-app-url.com",
     "iconUrl": "https://your-app-url.com/icon.png",
     "splashImageUrl": "https://your-app-url.com/splash.png",
-    "splashBackgroundColor": "#f7f7fb",
+    "splashBackgroundColor": "0000FF",
     "subtitle": "Any content \u2192 QR",
     "description": "Turn any text or link into a clean QR code.",
     "primaryCategory": "utility",

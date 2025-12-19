@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { QRCodeCanvas } from "qrcode.react";
 import { sdk } from "@farcaster/miniapp-sdk";
 
@@ -19,7 +19,9 @@ function clamp(n: number, min: number, max: number) {
 }
 
 export default function QRStudioClient() {
-  const sp = useSearchParams();
+    const router = useRouter();
+  const [isMiniApp, setIsMiniApp] = useState(false);
+const sp = useSearchParams();
 
   const [label, setLabel] = useState("My QR");
   const [content, setContent] = useState("");
@@ -32,6 +34,12 @@ export default function QRStudioClient() {
 
   useEffect(() => {
     sdk.actions.ready();
+  }, []);
+
+  useEffect(() => {
+    sdk.isInMiniApp()
+      .then((v) => setIsMiniApp(v))
+      .catch(() => setIsMiniApp(false));
   }, []);
 
   // Prefill from URL: ?text=...&label=...
@@ -82,42 +90,111 @@ export default function QRStudioClient() {
     setContent("");
   }
 
-  async function copyQrImage() {
-    setErr(null);
-    if (!canvasRef.current) return;
+  
+  async function getPngBlob(): Promise<Blob> {
+    if (!canvasRef.current) throw new Error("QR not ready yet.");
+    const canvas = canvasRef.current;
+    const blob: Blob | null = await new Promise((resolve) =>
+      canvas.toBlob((b) => resolve(b), "image/png")
+    );
+    if (!blob) throw new Error("Could not create image.");
+    return blob;
+  }
+
+  async function blobToDataUrl(blob: Blob): Promise<string> {
+    return await new Promise((resolve, reject) => {
+      const r = new FileReader();
+      r.onerror = () => reject(new Error("Could not read image."));
+      r.onload = () => resolve(String(r.result));
+      r.readAsDataURL(blob);
+    });
+  }
+
+  async function openSaveView(blob: Blob) {
     try {
-      const canvas = canvasRef.current;
-      const blob: Blob | null = await new Promise((resolve) =>
-        canvas.toBlob((b) => resolve(b), "image/png")
-      );
-
-      if (!blob) throw new Error("Could not create image blob.");
-
-      // Clipboard image API
-      // @ts-ignore
-      if (!navigator.clipboard?.write) throw new Error("Image clipboard not supported here.");
-      // @ts-ignore
-      await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
-
-      await showToast("QR copied ✅");
+      const dataUrl = await blobToDataUrl(blob);
+      const key = `qrimg:${Date.now()}:${Math.random().toString(16).slice(2)}`;
+      sessionStorage.setItem(key, dataUrl);
+      const url = `/save?id=${encodeURIComponent(key)}&label=${encodeURIComponent(
+        (label.trim() || "qr").replace(/\s+/g, " ")
+      )}`;
+      router.push(url);
     } catch (e: any) {
-      setErr(e?.message ?? "Copy failed. Try download.");
+      throw new Error(e?.message ?? "Could not open save view.");
     }
   }
 
-  function downloadQr() {
+async function copyQrImage() {
     setErr(null);
-    if (!canvasRef.current) return;
+    if (!canMake) return;
+
     try {
-      const canvas = canvasRef.current;
-      const url = canvas.toDataURL("image/png");
+      const blob = await getPngBlob();
+
+      // Try real clipboard image copy (works on desktop browsers).
+      try {
+        // @ts-ignore
+        await navigator.clipboard.write([
+          // @ts-ignore
+          new ClipboardItem({ "image/png": blob }),
+        ]);
+        await showToast("QR copied ✅");
+        return;
+      } catch {
+        // fall through
+      }
+
+      // Try native share sheet (often works on mobile / webviews).
+      try {
+        const file = new File([blob], "qr.png", { type: "image/png" });
+        // @ts-ignore
+        if (navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
+          // @ts-ignore
+          await navigator.share({ files: [file], title: "QR" });
+          await showToast("Shared ✅");
+          return;
+        }
+      } catch {
+        // fall through
+      }
+
+      // Base App fallback: open a save screen where the user can long‑press to save/copy.
+      await openSaveView(blob);
+      await showToast("Tip: long‑press QR to save/copy");
+    } catch (e: any) {
+      setErr(e?.message ?? "Copy failed.");
+    }
+
+  }
+
+  async function downloadQr() {
+    setErr(null);
+    if (!canMake) return;
+
+    try {
+      const blob = await getPngBlob();
+
+      // In Base App (or any Mini App webview), file downloads are often blocked.
+      // So we open a dedicated save screen instead.
+      if (isMiniApp) {
+        await openSaveView(blob);
+        await showToast("Tip: long‑press QR to save");
+        return;
+      }
+
+      // Regular web: trigger a download.
+      const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
       a.download = `${(label.trim() || "qr").replace(/\s+/g, "-").toLowerCase()}.png`;
+      document.body.appendChild(a);
       a.click();
-    } catch {
-      setErr("Download failed.");
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (e: any) {
+      setErr(e?.message ?? "Download failed.");
     }
+
   }
 
   async function share() {

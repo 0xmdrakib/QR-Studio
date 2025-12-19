@@ -124,6 +124,26 @@ const sp = useSearchParams();
     }
   }
 
+
+
+function apiQrUrl(opts: { download?: boolean }) {
+  const u = new URL("/api/qr", window.location.origin);
+  u.searchParams.set("text", trimmed);
+  u.searchParams.set("label", label.trim() || "qr");
+  u.searchParams.set("size", "1200");
+  if (opts.download) u.searchParams.set("download", "1");
+  return u.toString();
+}
+
+async function openExternally(url: string) {
+  try {
+    await sdk.actions.openUrl(url);
+  } catch {
+    // Fallback for regular browsers or clients without openUrl.
+    window.open(url, "_blank", "noopener,noreferrer");
+  }
+}
+
 async function copyQrImage() {
     setErr(null);
     if (!canMake) return;
@@ -158,9 +178,9 @@ async function copyQrImage() {
         // fall through
       }
 
-      // Base App fallback: open a save screen where the user can long‑press to save/copy.
-      await openSaveView(blob);
-      await showToast("Tip: long‑press QR to save/copy");
+      // Mini App / WebView fallback: open the PNG via SDK navigation (more reliable than clipboard/download in webviews).
+      await openExternally(apiQrUrl({ download: false }));
+      await showToast("Opened QR image ✅");
     } catch (e: any) {
       setErr(e?.message ?? "Copy failed.");
     }
@@ -174,11 +194,11 @@ async function copyQrImage() {
     try {
       const blob = await getPngBlob();
 
-      // In Base App (or any Mini App webview), file downloads are often blocked.
-      // So we open a dedicated save screen instead.
+      // In Base App (or any Mini App webview), downloads are often blocked.
+      // Open a direct image URL with Content-Disposition so the client can handle saving.
       if (isMiniApp) {
-        await openSaveView(blob);
-        await showToast("Tip: long‑press QR to save");
+        await openExternally(apiQrUrl({ download: true }));
+        await showToast("Opened download ✅");
         return;
       }
 

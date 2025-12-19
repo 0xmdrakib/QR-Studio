@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
-const APP_URL = "https://your-app-url.com";
-const BASE_APP_ID = "REPLACE_BASE_APP_ID"; // from Base Build modal
+const APP_URL = "https://qr-studio-plum.vercel.app/";
+const BASE_APP_ID = "6944770bd77c069a945be06e"; // from Base Build modal
 
 export const metadata: Metadata = {
   title: "QR Studio",

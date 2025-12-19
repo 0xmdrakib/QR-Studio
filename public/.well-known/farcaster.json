@@ -7,11 +7,11 @@
   "miniapp": {
     "version": "1",
     "name": "QR Studio",
-    "homeUrl": "https://your-app-url.com",
-    "iconUrl": "https://your-app-url.com/icon.png",
-    "splashImageUrl": "https://your-app-url.com/splash.png",
-    "splashBackgroundColor": "0000FF",
-    "subtitle": "Any content \u2192 QR",
+    "homeUrl": "https://qr-studio-plum.vercel.app/",
+    "iconUrl": "https://qr-studio-plum.vercel.app/icon.png",
+    "splashImageUrl": "https://qr-studio-plum.vercel.app/splash.png",
+    "splashBackgroundColor": "#0000FF",
+    "subtitle": "Any content to QR",
     "description": "Turn any text or link into a clean QR code.",
     "primaryCategory": "utility",
     "tags": [
@@ -19,14 +19,14 @@
       "qr",
       "wallet"
     ],
-    "heroImageUrl": "https://your-app-url.com/hero.png",
+    "heroImageUrl": "https://qr-studio-plum.vercel.app/hero.png",
     "screenshotUrls": [
-      "https://your-app-url.com/hero.png"
+      "https://qr-studio-plum.vercel.app/hero.png"
     ],
     "tagline": "Anything to QR.",
     "ogTitle": "QR Studio",
     "ogDescription": "Turn any text or link into a clean QR code.",
-    "ogImageUrl": "https://your-app-url.com/hero.png",
+    "ogImageUrl": "https://qr-studio-plum.vercel.app/hero.png",
     "noindex": true
   }
 }

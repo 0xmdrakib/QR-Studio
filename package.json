@@ -14,7 +14,8 @@
     "next": "^14.2.0",
     "qrcode.react": "^4.2.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "qrcode": "^1.5.3"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",
@@ -22,6 +23,7 @@
     "@types/react-dom": "^18.2.0",
     "typescript": "^5.4.0",
     "eslint": "^8.0.0",
-    "eslint-config-next": "^14.2.0"
+    "eslint-config-next": "^14.2.0",
+    "@types/qrcode": "^1.5.5"
   }
 }

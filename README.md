@@ -1,4 +1,4 @@
-Just completed "QR Studio" as a @base Mini App 🟦
+Just completed "QR Studio" as a https://x.com/base Mini App 🟦
 
 ▪︎ Turn any text, address or link into a clean QR code.
 ▪︎ Also you can download instantly. 
